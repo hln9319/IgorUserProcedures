@@ -20,11 +20,9 @@ Function initialize()
 
 	String/g scanMove
 	Variable/g loadingNum = -1, totalLoads = 0, folderNumber=1, runCycleCount = 1
-	Variable/g scanCycleCount = 1, channel, allXOffset, allLength = 500, allYOffset, allHeight = 500
-	Variable/g xOffset, length, yOffset, height, x0InPuzzle, y0InPuzzle
+	Variable/g scanCycleCount = 1, channel
 	make/T fullInfo, folderInfo
 	make/T/N=(10, 3) loadingInfo
-	make/N=(15, 13) puzzleParts
 End
 
 Macro start()
@@ -38,8 +36,7 @@ EndMacro
 
 Window AFMdataAnalyzer() : Panel
 	PauseUpdate; Silent 1		// building window...
-	NewPanel /K=1 /W=(1351,204,1538,432) as "AFMdataAnalyzer"
-	SetDrawLayer UserBack
+	NewPanel /K=1 /W=(1054,85,1241,313) as "AFMdataAnalyzer"
 	Button openFile,pos={10,10},size={50,20},proc=Load,title="Load"
 	Button showgraph,pos={10,45},size={50,20},proc=ButtonProc,title="Show"
 	SetVariable folderNumber,pos={70,45},size={80,16},proc=folderNumberChanged,title="Folder"
@@ -59,8 +56,8 @@ Window AFMdataAnalyzer() : Panel
 	SetVariable scanCycleCount,pos={90,75},size={30,16},proc=scanIdChanged,title=" "
 	SetVariable scanCycleCount,limits={1,inf,1},value= scanCycleCount
 	Button buildPuzzle,pos={10,165},size={80,20},proc=buildPuzzle,title="Build Puzzle"
-	PopupMenu channelNameMenu,pos={10,95},size={142,28},proc=channelNameMenuSelected,title="Channel"
-	PopupMenu channelNameMenu,mode=1,popvalue="Damping",value= #"\"Damping;Df;Z;Fn;Fl\""
+	PopupMenu channelNameMenu,pos={10,95},size={95,28},proc=channelNameMenuSelected,title="Channel"
+	PopupMenu channelNameMenu,mode=2,popvalue="Df",value= #"\"Damping;Df;Z;Fn;Fl\""
 EndMacro
 
 static StrConstant resultFileSuffix = ".mtrx"
@@ -390,7 +387,7 @@ End
 
 Window FileInfo() : Panel
 	PauseUpdate; Silent 1		// building window...
-	NewPanel /W=(1254,428,1690,662) as "FileInfo"
+	NewPanel /W=(1254,428,1686,680) as "FileInfo"
 	SetVariable FilePath,pos={20,20},size={400,16},disable=2,title="FilePath"
 	SetVariable FilePath,value= folderInfo[0]
 	SetVariable FileName,pos={20,45},size={400,16},disable=2,title="FileName"
@@ -407,16 +404,20 @@ Window FileInfo() : Panel
 	SetVariable setvar6,limits={-inf,inf,0},value= folderInfo[7]
 	SetVariable setvar7,pos={220,145},size={180,16},disable=2,title="NonContactVibrationAmplitude"
 	SetVariable setvar7,limits={-inf,inf,0},value= folderInfo[8]
-	SetVariable setvar8,pos={20,170},size={400,16},disable=2,title="ScanRange"
+	SetVariable setvar8,pos={20,170},size={200,16},disable=2,title="XRange"
 	SetVariable setvar8,limits={-inf,inf,0},value= folderInfo[9]
-	SetVariable setvar9,pos={220,95},size={174,16},disable=2,title="NumberOfPoints"
-	SetVariable setvar9,limits={-inf,inf,0},value= folderInfo[10]
+	SetVariable setvar9,pos={20,195},size={174,16},disable=2,title="XPoints"
+	SetVariable setvar9,limits={-inf,inf,0},value= folderInfo[11]
 	SetVariable setvar10,pos={220,120},size={100,16},disable=2,title="ChannelUnit"
 	SetVariable setvar10,limits={-inf,inf,0},value= folderInfo[6]
-	SetVariable xIncrement,pos={20,195},size={190,16},disable=2,title="X Increment"
-	SetVariable xIncrement,limits={-inf,inf,0},value= folderInfo[11]
-	SetVariable yIncrement,pos={220,195},size={190,16},disable=2,title="Y Increment"
-	SetVariable yIncrement,limits={-inf,inf,0},value= folderInfo[12]
+	SetVariable xIncrement,pos={20,220},size={190,16},disable=2,title="X Increment"
+	SetVariable xIncrement,limits={-inf,inf,0},value= folderInfo[13]
+	SetVariable yIncrement,pos={220,220},size={190,16},disable=2,title="Y Increment"
+	SetVariable yIncrement,limits={-inf,inf,0},value= folderInfo[14]
+	SetVariable setvar0,pos={220,170},size={200,16},disable=2,title="YRange"
+	SetVariable setvar0,limits={-inf,inf,0},value= folderInfo[10]
+	SetVariable setvar1,pos={220,195},size={174,16},disable=2,title="YPoints"
+	SetVariable setvar1,limits={-inf,inf,0},value= folderInfo[12]
 EndMacro
 
 Function UpdateInfo()
@@ -437,11 +438,13 @@ Function UpdateInfo()
 	folderInfo[7] = fullInfo[30][1]+fullInfo[31][1] // noncontact adjust frequency
 	folderInfo[8] = fullInfo[32][1]+fullInfo[33][1] // noncontact vibration amplitude
 	n = SearchString(fullInfo,"XYScanner.Height.value")
-	folderInfo[9] = fullInfo[n][1]+fullInfo[n+1][1] + " x " + fullInfo[n+34][1]+fullInfo[n+35][1] // scan range
+	folderInfo[9] = fullInfo[n][1]+fullInfo[n+1][1] // x scan range
+	folderInfo[10] = fullInfo[n+34][1]+fullInfo[n+35][1] // y scan range
 	n = SearchString(fullInfo,"XYScanner.Lines.value")
-	folderInfo[10] = fullInfo[n][1]+" x "+fullInfo[n+6][1] // number of points
-	folderInfo[11] = fullInfo[SearchString(fullInfo,"X.physicalIncrement")][1] // x increment
-	folderInfo[12] = fullInfo[SearchString(fullInfo,"Y.physicalIncrement")][1] // y increment
+	folderInfo[11] = fullInfo[n][1] // x number of points
+	folderInfo[12] = fullInfo[n+6][1] // y number of points
+	folderInfo[13] = fullInfo[SearchString(fullInfo,"X.physicalIncrement")][1] // x increment
+	folderInfo[14] = fullInfo[SearchString(fullInfo,"Y.physicalIncrement")][1] // y increment
 End
 
 Proc checkInfo(ba) : ButtonControl
