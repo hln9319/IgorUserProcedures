@@ -4,7 +4,7 @@ Author: Lunan Huang
 Ph.D. Candidate
 Iowa State University
 
-ARPES group members (2015): Yun Wu, Daixiang Mou, Benjamin Shrunck, Adam Kaminski(Leeder)
+ARPES group members (2015): Yun Wu, Daixiang Mou, Benjamin Shrunck, Adam Kaminski(Leader)
 
 All rights preserved.
 
