@@ -45,6 +45,8 @@ Function setParemetersFromGraph()
 	firstMax = (wavemin($imageName) + wavemax($imageName)) / 2
 	lastMin = firstMax
 	lastMax = firstMax + wavemax($imageName)
+	setSliderLimits("firstColorController", firstMin, firstMax)
+	setSliderLimits("lastColorController", lastMin, lastMax)
 End
 
 // get the image name in the top window, assuming there's only one image in the window.
@@ -139,13 +141,15 @@ End
 Function autoSetColor(ba) : ButtonControl
 	STRUCT WMButtonAction &ba
 
-	NVAR reverseColorChecked
+	NVAR reverseColorChecked, firstMin, firstMax, lastMin, lastMax
 	switch( ba.eventCode )
 		case 2: // mouse up
 			// click code here
 			setParemetersFromGraph()
 			String imageName = getWave0InTopGraph()
 			ModifyImage $imageName ctab= {*, *, , reverseColorChecked}
+			setSliderLimits("firstColorController", firstMin, firstMax)
+			setSliderLimits("lastColorController", lastMin, lastMax)
 			break
 		case -1: // control being killed
 			break
