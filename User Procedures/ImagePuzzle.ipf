@@ -202,13 +202,19 @@ Function addImageToPuzzle(windowName)
 		puzzleGlobal[4] = puzzleGlobal[0]
 		puzzleGlobal[5] = puzzleGlobal[1]
 	endif
-	
+
 	for(i = 0; i < DimSize(puzzleParts, 0); i += 1)
 		if (puzzleParts[i][0] == loadingNum && puzzleParts[i][1] == folderNumber && puzzleParts[i][2] == scanMove)
 			printf "This image is alreay added as part %d!\r", i
 			return 0
 		endif
 	endfor
+	
+	Variable collision = getPartNum(puzzleGlobal[6], puzzleGlobal[7])
+	if (collision >= 0)
+		printf "Image %d is alreay at this position!\r", puzzleParts[collision][9]
+		return 0
+	endif
 	
 	// reserve the first row for the current part.
 	puzzleParts[0][1] = 1
