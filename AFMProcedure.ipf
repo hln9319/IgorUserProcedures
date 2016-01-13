@@ -462,85 +462,11 @@ Function LineProfile(ba) : ButtonControl
 		case 2: // mouse up
 			// click code here
 			WMCreateImageLineProfileGraph()
-//			UpdateLineProfile()
-//			CheckCursorMove()
 			break
 		case -1: // control being killed
 			break
 	endswitch
 	return 0
-End
-
-Function UpdateLineProfile()
-	wave xCursors, yCursors,W_ImageLineProfile
-	string imageFile,windowName,cursorPositionX,cursorPositionY,lineProfile
-	NVAR folderNumber
-	SVAR scanMove
-	variable cursorDistance,i,sizeOfProfile
-	wave/T folderInfo
-	sprintf windowName, "Image_"+scanMove
-	for(i=1;i<6;i+=1)
-		DoWindow/f $windowName
-		if(strlen(CsrInfo($cursorEnum(2*i-1)))>0 && strlen(CsrInfo($cursorEnum(2*i)))>0)
-			make/o W_ImageLineProfile
-			make/O/N=2 xCursors,yCursors
-			sprintf cursorPositionX, "xCursor"+cursorEnum(2*i-1)+cursorEnum(2*i)
-			sprintf cursorPositionY, "yCursor"+cursorEnum(2*i-1)+cursorEnum(2*i)
-			xCursors = {xcsr($cursorEnum(2*i-1)),xcsr($cursorEnum(2*i))}
-			yCursors = {vcsr($cursorEnum(2*i-1)),vcsr($cursorEnum(2*i))}
-			make/o/N=2 $cursorPositionX=xCursors
-			make/o/N=2 $cursorPositionY=yCursors
-			sprintf imageFile, "akw2d_"+scanMove
-			ImageLineProfile srcWave=$imageFile, xWave=xCursors, yWave=yCursors
-			DoWindow/f $windowName
-			Checkdisplayed $cursorPositionY
-			If(V_flag==0)
-				AppendtoGraph $cursorPositionY vs $cursorPositionX
-				ModifyGraph rgb($cursorPositionY)=(mod(i*13056, 65280),mod(i*13056*2, 65280),mod(i*13056*3, 65280))
-			endif
-			sprintf lineProfile, "lineProfileOfCursors"+cursorEnum(2*i-1)+cursorEnum(2*i)
-			sizeOfProfile=DimSize(W_ImageLineProfile,0)
-			make/o/N=(sizeOfProfile) $lineProfile=W_ImageLineProfile
-			DoWindow/f LineProfileWindow
-			If(V_flag==0)
-				display
-				DoWindow/c LineProfileWindow
-				AppendToGraph $lineProfile
-				ModifyGraph rgb($lineProfile)=(mod(i*13056, 65280),mod(i*13056*2, 65280),mod(i*13056*3, 65280))
-			endif
-			Checkdisplayed $lineProfile
-			If(V_flag==0)
-				AppendToGraph $lineProfile
-				ModifyGraph rgb($lineProfile)=(mod(i*13056, 65280),mod(i*13056*2, 65280),mod(i*13056*3, 65280))
-			endif
-			cursorDistance=sqrt((xCursors[0]-xCursors[1])^2+(yCursors[0]-yCursors[1])^2)
-			ModifyGraph muloffset={cursorDistance/sizeOfProfile,0}
-			ModifyGraph margin(left)=36,margin(bottom)=29,margin(top)=7,margin(right)=7
-			ModifyGraph tick=2
-			Label left folderInfo[6];
-		endif
-	Endfor
-End
-
-Function CursorWindowHook(s)
-	STRUCT WMWinHookStruct &s	
-	Variable hookResult = 0	// 0 if we do not handle event, 1 if we handle it.
-	switch(s.eventCode)
-		case 5:
-			UpdateLineProfile()// "mouseup"
-			break
-	endswitch
-
-	return hookResult	// If non-zero, we handled event and Igor will ignore it.
-End
-
-Function CheckCursorMove()
-	NVAR folderNumber
-	SVAR scanMove
-	string windowName
-	sprintf windowName, "Image_"+scanMove
-	DoWindow/f $windowName				
-	SetWindow $windowName, hook(MyHook) = CursorWindowHook	// Install window hook
 End
 
 Function SearchString(bag,apple)
@@ -567,34 +493,6 @@ Function/S scanMoveEnum(n)
 			return "Down"
 		case 4:
 			return "ReDown"
-		default:
-			return ""
-	endswitch
-End
-
-Function/S cursorEnum(n)
-	variable n
-	Switch(n)
-		case 1:
-			return "A"
-		case 2:
-			return "B"
-		case 3:
-			return "C"
-		case 4:
-			return "D"
-		case 5:
-			return "E"
-		case 6:
-			return "F"
-		case 7:
-			return "G"
-		case 8:
-			return "H"
-		case 9:
-			return "I"
-		case 10:
-			return "J"
 		default:
 			return ""
 	endswitch

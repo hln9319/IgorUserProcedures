@@ -218,8 +218,8 @@ Function addImageToPuzzle(windowName)
 	puzzleParts[0] = puzzleParts[puzzlePartNumber][q]
 	duplicate/o $targetWaveName $destination
 	redimensionPuzzleIfNeeded(puzzlePartNumber)
-	setPuzzleValues(puzzlePartNumber, $destination)
 	displayPuzzle()
+	setPuzzleValues(puzzlePartNumber, $destination)
 	checkdisplayed highlightArea
 	If(V_flag==0)
 		updateHA(puzzleGlobal[6], puzzleGlobal[7])
@@ -572,11 +572,12 @@ End
 
 Function resetPuzzle(ba) : ButtonControl
 	STRUCT WMButtonAction &ba
-	Wave puzzle
+	Wave puzzle, puzzleGlobal
 	switch( ba.eventCode )
 		case 2: // mouse up
 			// click code here
 			puzzle = 0
+			puzzleGlobal = 0
 			removeAllParts()
 			break
 		case -1: // control being killed
