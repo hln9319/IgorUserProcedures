@@ -633,7 +633,6 @@ Function rowColumnChanged()
 	endif
 End
 
-
 Function updateAll(ba) : ButtonControl
 	STRUCT WMButtonAction &ba
 
