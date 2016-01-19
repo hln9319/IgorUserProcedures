@@ -2,7 +2,7 @@
 
 Macro colorControl()
 	if (WinType("colorScaleController") != 7)
-		Variable/g reverseColorChecked, firstMin, firstMax, lastMin, lastMax
+		Variable/g reverseColorChecked, firstMin, firstMax, lastMin, lastMax, firstColorValue, lastColorValue
 		colorScaleController()
 	endif
 	DoWindow/F colorScaleController
@@ -11,16 +11,16 @@ End
 
 Window colorScaleController() : Panel
 	PauseUpdate; Silent 1		// building window...
-	NewPanel /W=(771,211,1204,395) as "Color Scale Controller"
+	NewPanel /W=(1280,190,1713,374) as "Color Scale Controller"
 	SetDrawLayer UserBack
 	SetDrawEnv fname= "MS Sans Serif",fsize= 16
 	DrawText 20,72,"First Color"
 	SetDrawEnv fname= "MS Sans Serif",fsize= 16
 	DrawText 20,132,"Last Color"
 	Slider lastColorController,pos={110,110},size={300,29},proc=adjustColor
-	Slider lastColorController,limits={0,0.02,0},value= 0.000283687943262411,vert= 0,ticks= 0
+	Slider lastColorController,limits={-104.413,384.519,0},variable= lastColorValue,vert= 0,ticks= 0
 	Slider firstColorController,pos={110,50},size={300,29},proc=adjustColor
-	Slider firstColorController,limits={0,0,0},value= 0,vert= 0,ticks= 0
+	Slider firstColorController,limits={-593.345,-104.413,0},variable= firstColorValue,vert= 0,ticks= 0
 	SetVariable firstColorLowLimit,pos={110,80},size={90,24},proc=limitsChanged,title="Min"
 	SetVariable firstColorLowLimit,fSize=16,value= firstMin
 	SetVariable firstColorHighLimit,pos={320,80},size={90,24},proc=limitsChanged,title="Max"
@@ -34,17 +34,24 @@ Window colorScaleController() : Panel
 	PopupMenu colorTable,pos={200,20},size={200,28},proc=colorChanged,fSize=16
 	PopupMenu colorTable,mode=7,value= #"\"*COLORTABLEPOP*\""
 	Button autoSetColor,pos={145,20},size={50,20},proc=autoSetColor,title="Auto"
+	SetVariable firstColorValueDisplay,pos={220,80},size={81,16},disable=2,title=" "
+	SetVariable firstColorValueDisplay,limits={-inf,inf,0},value= firstColorValue
+	SetVariable lastColorValueDisplay,pos={220,140},size={80,16},disable=2,title=" "
+	SetVariable lastColorValueDisplay,limits={-inf,inf,0},value= lastColorValue
 EndMacro
 
 Function setParemetersFromGraph()
-	NVAR reverseColorChecked, firstMin, firstMax, lastMin, lastMax
+	NVAR reverseColorChecked, firstMin, firstMax, lastMin, lastMax, firstColorValue, lastColorValue
 	String imageName = getWave0InTopGraph()
 	String ctab = StringByKey("RECREATION", ImageInfo("",imageName, 0))
 	reverseColorChecked = str2num(StringFromList(3, ctab, ","))
-	firstMin = (wavemin($imageName) - wavemax($imageName)) / 2
-	firstMax = (wavemin($imageName) + wavemax($imageName)) / 2
+	firstColorValue = wavemin($imageName)
+	lastColorValue = wavemax($imageName)
+	firstMin = (3 * firstColorValue - lastColorValue) / 2
+	firstMax = (firstColorValue + lastColorValue) / 2
 	lastMin = firstMax
-	lastMax = firstMax + wavemax($imageName)
+	lastMax = (-firstColorValue + 3 * lastColorValue) / 2
+	print firstColorValue
 	setSliderLimits("firstColorController", firstMin, firstMax)
 	setSliderLimits("lastColorController", lastMin, lastMax)
 End
